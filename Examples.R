@@ -509,24 +509,31 @@ cdata <- dcast(mdata,month~city , value.var="AvgTemp")
 # A faceting specification describes how to break up the data into subsets and how to display those subsets as small multiples. 
 # This is also known as conditioning or latticing/trellising.
 
+# Components of Plots:
+#     1)data
+#     2)Aesthetics
+#     3)Geometric objects
+#     4)Statistical Transformations
+#     5)Position Adjustments
+#     6)Facets
+#     7)scales
+#     8)Coordinates
 
-
-#Simple Pie Chart
-slices <- c(10,12,4,16,8)
-lbls <- c("US", "UK", "Australia", "Germany", "France")
-pie_df <-data.frame(slices,lbls)
-pie(x=slices, labels=lbls, col=rainbow(length(lbls)), density=c(10,50,100,250,500) ,main="Pie Chart of Countries")
-pie(x=pie_df$slices,labels = pie_df$lbls, col=rainbow(length(pie_df$lbls)), density=c(10,50,100,250,500) ,main="Pie Chart of Countries")
-
-# Simple Bar Plot 
-counts <- data.frame(table(mtcars$gear))
-barplot(counts$Freq, names.arg = counts$Var1, main="Car Distribution", xlab="Number of Gears", ylab="Count")
-
-
-
-
-
-
+# FORMAT : ggplot() + layers()
+library(ggplot2)
+options(scipen=999)  # turn-off scientific notation like 1e+48
+# SCATTERPLOT
+scatterplot <- ggplot(midwest, aes(x=area, y=poptotal)) + 
+    geom_point(aes(col=state, size=popdensity)) + 
+    geom_smooth(method="loess", se=F) + 
+    xlim(c(0, 0.1)) + 
+    ylim(c(0, 500000)) + 
+    labs(subtitle="Area Vs Population", 
+         y="Population", 
+         x="Area", 
+         title="Scatterplot", 
+         caption = "Source: midwest")
+plot(scatterplot)
 
 
 
