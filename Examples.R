@@ -520,20 +520,106 @@ cdata <- dcast(mdata,month~city , value.var="AvgTemp")
 #     8)Coordinates
 
 # FORMAT : ggplot() + layers()
+
+install.packages("ggExtra")
 library(ggplot2)
+library(ggthemes)
 options(scipen=999)  # turn-off scientific notation like 1e+48
+
 # SCATTERPLOT
 scatterplot <- ggplot(midwest, aes(x=area, y=poptotal)) + 
     geom_point(aes(col=state, size=popdensity)) + 
     geom_smooth(method="loess", se=F) + 
     xlim(c(0, 0.1)) + 
     ylim(c(0, 500000)) + 
-    labs(subtitle="Area Vs Population", 
-         y="Population", 
-         x="Area", 
-         title="Scatterplot", 
-         caption = "Source: midwest")
+    labs(subtitle="Area Vs Population", y="Population", x="Area", title="Scatterplot", caption = "Source: midwest")
 plot(scatterplot)
+
+# JITTERPLOT
+jitterplot <- ggplot(mpg, aes(cty, hwy))+ 
+    geom_jitter(width = .5, size=1) +
+    labs(subtitle="mpg: city vs highway mileage", y="hwy", x="cty", title="Jittered Points")
+plot(jitterplot)
+
+# COUNTPLOT
+countplot <- ggplot(mpg, aes(cty, hwy))+ 
+    geom_count(col="tomato3", show.legend=F) +
+    labs(subtitle="mpg: city vs highway mileage", y="hwy", x="cty", title="Counts Plot")
+plot(countplot)
+
+# BUBBLEPLOT
+bubbleplot <- ggplot(mpg[mpg$manufacturer %in% c("audi", "ford", "honda", "hyundai"), ], aes(displ, cty)) + 
+    geom_jitter(aes(col=manufacturer, size=hwy)) + 
+    geom_smooth(aes(col=manufacturer), method="lm", se=F) +
+    labs(subtitle="mpg: Displacement vs City Mileage", title="Bubble chart")
+plot(bubbleplot)
+
+# HISTOGRAM ON CONTINUOUS VARIABLE
+histogram_continuous <- ggplot(mpg, aes(displ)) + scale_fill_brewer(palette = "Spectral")+ 
+    geom_histogram(aes(fill=class), binwidth = .1, col="black", size=.1) +
+    # geom_histogram(aes(fill=class), bins=5, col="black", size=.1)
+    labs(title="Histogram with Auto Binning", subtitle="Engine Displacement across Vehicle Classes")
+    # labs(title="Histogram with Fixed Bins", subtitle="Engine Displacement across Vehicle Classes")
+plot(histogram_continuous)
+
+# HISTOGRAM ON CATEGORICAL VARIABLES
+histogram_categorical <- ggplot(mpg, aes(manufacturer))+ 
+    geom_bar(aes(fill=class), width = 0.5) + 
+    theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+    labs(title="Histogram on Categorical Variable", subtitle="Manufacturer across Vehicle Classes")
+plot(histogram_categorical)
+
+# DENSITY PLOT
+densityplot <- ggplot(mpg, aes(cty))+ 
+    geom_density(aes(fill=factor(cyl)), alpha=0.8) + 
+    labs(title="Density plot", subtitle="City Mileage Grouped by Number of cylinders",caption="Source: mpg",x="City Mileage",fill="# Cylinders")
+plot(densityplot)
+
+# BOXPLOT
+boxplot <- ggplot(mpg, aes(class, cty))+ 
+    geom_boxplot(varwidth=T, fill="plum") + 
+    labs(title="Box plot", subtitle="City Mileage grouped by Class of vehicle",caption="Source: mpg",x="Class of Vehicle",y="City Mileage")
+plot(boxplot)
+
+# DOTPLOT
+dotplot <- ggplot(mpg, aes(manufacturer, cty)) +
+    geom_dotplot(binaxis='y', stackdir='center', dotsize = .5, fill="red") +
+    theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+    labs(title="Dot plot", subtitle="City Mileage vs Class: Each dot represents 1 row in source data",caption="Source: mpg",x="Class of Vehicle",y="City Mileage")
+plot(dotplot)
+
+# TUFTEPLOT
+tufteplot <- ggplot(mpg, aes(manufacturer, cty)) + 
+    geom_tufteboxplot() + 
+    theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+    labs(title="Tufte Styled Boxplot", subtitle="City Mileage grouped by Class of vehicle",caption="Source: mpg",x="Class of Vehicle",y="City Mileage")
+plot(tufteplot)
+
+# VIOLINPLOT
+violinplot <- ggplot(mpg, aes(class, cty))+ 
+    geom_violin() + 
+    labs(title="Violin plot", subtitle="City Mileage vs Class of vehicle",caption="Source: mpg",x="Class of Vehicle",y="City Mileage")
+plot(violinplot)
+
+# POPULATION PYRAMID
+email_campaign_funnel <- read.csv("https://raw.githubusercontent.com/selva86/datasets/master/email_campaign_funnel.csv")
+brks <- seq(-15000000, 15000000, 5000000)
+lbls = paste0(as.character(c(seq(15, 0, -5), seq(5, 15, 5))), "m")
+
+populationpyramid <- ggplot(email_campaign_funnel, aes(x = Stage, y = Users, fill = Gender)) + 
+    geom_bar(stat = "identity", width = .6) +   # draw the bars
+    scale_y_continuous(breaks = brks, labels = lbls) + # Breaks & Labels
+    coord_flip() +  # Flip axes
+    labs(title="Email Campaign Funnel") +
+    theme_tufte() +  # Tufte theme from ggfortify
+    theme(plot.title = element_text(hjust = .5), axis.ticks = element_blank()) +   # Centre plot title
+    scale_fill_brewer(palette = "Dark2")  # Color palette
+plot(populationpyramid)
+
+
+
+
+
 
 
 
