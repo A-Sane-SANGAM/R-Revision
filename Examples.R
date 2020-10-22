@@ -1,65 +1,16 @@
+#Loading required packages
+used_libraries <- c("dplyr","lubridate")
+lapply(used_libraries, require, character.only = TRUE)
 
 getwd()
-setwd("C:/Users/sangam.kushwaha/Documents/Learn_R/")  
-data_set <- read.csv("PROMOTIONS_DIM_ECOMM.csv")
 
+# Creating a Vector
+v1 <- c(1:12)
 
-str(data_set)
-summary(data_set)
-names(data_set)
-colnames(data_set)
-rownames(data_set)
+# Creating a matrix
+m1 <- matrix(v1,nrow = 4,byrow = FALSE)
 
-
-#Column Manipulation
-data_set[1,2]   
-data_set[1]     #List
-data_set[,1]    #Vector
-data_set$sku    #Vector
-remove_first_column <- data_set[-1]
-
-#Row Manipulation
-data_set[1,]    
-data_set[c(1,3),]
-data_set[c(1,3),c(1,2)]
-remove_row_column <- data_set[-1,-c(2,3)]
-
-
-#Subsetting based on condition 
-subset1 <- data_set[which(data_set$sku=='100047'),]
-subset2 <- data_set[which(data_set$sku=='100047'),c(1,2,4,5)]
-
-
-#Missing values treatment
-is.na(data_set)
-a <- data_set
-a[is.na(a)] <- 0
-View(na.omit(data_set))
-
-
-#Flow control
-m1 = matrix(floor(100*runif(12)),4,3)
-ifelse(m1 %% 2 == 0, "Even", "Odd")
-
-data_set$Merch_Level <- as.character(0)
-subset3 <- unique(data_set[,c(1,9,13,14,16)])
-subset3[is.na(subset3)] <- 0
-subset3 <- subset3[which(subset3$SGM_Category_Group != 0),]
-subset3 <- subset3[1:500,]
-i=1
-N = nrow(subset3)
-repeat{
-    subset3[i,5] <- ifelse(subset3[i,2] == 'Collectibles',subset3[i,3], subset3[i,4])
-    if(i>=N) break
-    i=i+1
-}
-
-v1 <- c('1','3','4','8','2','7')
-for(i in v1){print(i)}
-
-install.packages("lubridate")
-library(lubridate)
-
+# Creating a dataframe
 df1 <- data.frame(
     id = c('1','2','3','4','5'),
     name = c('Sam','John','Mary','Rahul','Paul'),
@@ -68,17 +19,7 @@ df1 <- data.frame(
     stringsAsFactors = FALSE
 )
 
-str(df1)
-summary(df1)
-subset4 <- df1[c("id","name")]
-subset5 <- df1[c(1,3),c("id","job")]
-
-v2 <- c(1:12)
-m1 <- matrix(v2,nrow = 4,byrow = FALSE)
-colnames(m1) <- c("c1","c2","c3")
-
-
-#Exmaple of a list
+# Creating a list
 a1 <- "John"    #Character
 a2 <- 3.14      #Numeric
 a3 <- FALSE     #Logical
@@ -91,15 +32,184 @@ a8 <- data.frame(a1,a2,a3)                          #Data Frame
 l1 <- list(a1,a2,a3,a4,a5,a6,a7,a8)
 l1[[4]]
 l1[[4]][2]
-
-l2 <- list(Char=a1,Num=a2,Logical=a3,V_Num=a4,V_Char=a5,V_Logical=a6,Matrix=a7,DFrame=a8)                  #List
-l2$V_Num
-l2$V_Num[2]
-
+l2 <- list(Element1=a1,Element2=a2,Element3=a3,Element4=a4,Element5=a5,Element6=a6,Element7=a7,Element8=a8)                  #List
+l2$Element5
+l2$Element5[2]
 #Unlisting
 print(length(unlist(l1)))
 df2 <- matrix(unlist(l1), ncol = 11, byrow = TRUE)
 df3 <- data.frame(matrix(unlist(l1), ncol = ceiling(length(unlist(l1))/3), byrow=TRUE))
+
+
+#Reading country Data except first row
+country_data <- (read.csv("Country.csv", sep=";", header=TRUE))[-1,]
+#Creating a list which stores column numbers whose data type needs to be changed
+col_to_be_changed <- c(2:ncol(country_data)) 
+#Changing the data type of the columns
+country_data[,col_to_be_changed] <- as.numeric(as.character(unlist(country_data[col_to_be_changed])))
+#Removes scientific notation in R
+options(scipen = 999)
+#Storing names of dataframe in a list to modify it
+country_data_col_names <- names(country_data)
+#Substituting 3 successive dots with a space
+country_data_col_names <- gsub(pattern="\\.{3}", replacement=" ", ignore.case=TRUE, x=country_data_col_names)
+#Substituting a single dot with a space
+country_data_col_names <- gsub(pattern="\\.", replacement=" ", ignore.case=TRUE, x=country_data_col_names)
+#Substituting spaces with an underscore 
+country_data_col_names <- gsub(pattern="[[:space:]]", replacement="_", ignore.case=TRUE, x=country_data_col_names)
+#Substituting underscore at the end with a blank
+country_data_col_names <- gsub(pattern="_$", replacement="", ignore.case=TRUE, x=country_data_col_names)
+#Replacing the column names of the data
+names(country_data) <- country_data_col_names
+
+
+#Reading inflation data
+inflation_data <- read.csv("IncomeGroup.csv",header = TRUE)
+#Removing 3rd column from the data
+inflation_data <- inflation_data[,-3]
+#Storing names of dataframe in a list to modify it
+inflation_data_col <- names(inflation_data)
+#Modifying the names of columns
+inflation_data_col[3:ncol(inflation_data)] <- gsub(pattern="[^0-9]",replacement="",ignore.case=TRUE, x=inflation_data_col[3:ncol(inflation_data)])
+#Replacing column names with modified names
+names(inflation_data)<- inflation_data_col
+
+#METADATA
+#Get the structure, summary, field names, column names, row names of the data
+str(country_data)
+summary(country_data)
+names(country_data)
+colnames(country_data)
+rownames(country_data)
+
+#Get value stored at first row and second column of the data
+country_data[1,2]
+
+#COLUMN MANIPULATION
+#Get first column : output is a dataframe
+country_data[1]
+#Get first column : output is a list
+country_data[,1]
+#Get sku column : output is a list
+country_data$Country
+#Removing a column by its index
+remove_first_column <- country_data[-1]
+
+#ROW MANIPULATION
+#Get first row  : output is a dataframe
+country_data[1,]
+#Get specific rows : output is a dataframe
+country_data[c(1,3),]
+#Get values from specific rows and specific columns : output is a dataframe
+country_data[c(1,3),c(1,2)]
+#Removing specific rows and columns from the data
+remove_row_column <- country_data[-1,-c(2,3)]
+
+#SUBSETTING DATA
+#Subsetting data(rows) based on a condition and without condition
+subset1 <- country_data[which(country_data$Area_sq_km>1000000),]
+subset1a <- country_data[which(country_data[,2]>1000000),]
+#Subsetting data(rows and columns) based on a condition and without condition
+subset2 <- country_data[which(country_data$Area_sq_km>1000000),c(1,2,3,4)]
+subset2a <- country_data[which(country_data[,2]>1000000),c(1,2,3,4)]
+subset2b <- country_data[c(1:100),c("Country","Area_sq_km")]
+#Subsetting data(columns) based on a condition and without condition
+subset3 <- country_data[1:5]
+subset3a <- country_data[c("Country","Area_sq_km","Exports","GDP")]
+
+#MISSING VALUE TREATMENT
+#Output is a logical table which returns TRUE if value is NA else returns FALSE
+is.na(country_data)
+#Substituting NA's with 0 in the data
+temp1 <- country_data
+temp1[is.na(temp1)] <- 0
+#Omit those rows which has NA in them
+View(na.omit(country_data))
+#Omit rows with NA but only in certain columns
+View(na.omit(country_data[,c(1,2,3,4,5)]))
+
+
+#FLOW CONTROL STATEMENTS IN R ============================================================
+# IF Statement
+value_to_be_matched <- "Delhi" #Change the content of the string to see different results
+if(!is.na(match(value_to_be_matched,country_data[,1]))){
+    print("Country is in the list !")
+}
+
+# IF-ELSE Control Statement
+if(!is.na(match(value_to_be_matched,country_data[,1]))){
+    print("Country is in the list !")
+}else{
+    print("Country is not in the list !")
+}
+
+# IFELSE Control Statement
+# runif(n) generates n uniform random numbers between 0 and 1.
+# runif(n, a, b) generates n uniform random numbers between a and b.
+list1 <- floor(100*runif(12))
+matrix1 = matrix(list1,4,3)
+temp2 <- ifelse(matrix1 %% 2 == 0, "Even", "Odd")
+View(temp2)
+
+# REPEAT Control Statement
+i=1
+N = nrow(country_data)
+subset3 <- country_data[,1:2]
+subset3$Type <- "-"
+repeat{
+    subset3[i,3] <- ifelse(subset3[i,2]>=1000000,"Densely Populated",(ifelse(subset3[i,2]>500000 && subset3[i,2]<1000000,"Moderately Populated","Sparsely Populated")))
+    if(i>=N) break
+    i<-i+1
+}
+
+# FOR Control Statement
+#Iteration is done on a numeric vector
+vector1 <- c('1','2','3','4','5','6')
+for(i in vector1){
+    print("Hello there !")
+}
+#Iteration is done on a character vector
+vector2 <- c("Alpha","Beta","Charlie","Delta","Echo","Foxtrot","Gamma","Holland","India","Juliet")
+for(i in vector2){
+    print(paste0("Iteration ",match(i,vector2)," : ",i))
+}
+#Iteration is done on a list
+list2 <- c("1","One","2","Two","3","Three",vector1,vector2,subset4)
+subset4 <- country_data[1]
+for(i in list1){
+    print(paste0("Iteration ",match(i,list1)," : ",i))
+}
+
+# WHILE Control Statement
+i <- 1
+temp3 <- matrix(runif(nrow(country_data)),nrow(country_data),1) #Created a dummy matrix having same no of rows as country_data
+while(i<=nrow(country_data)){
+    temp3[i,1] <- paste0(country_data[i,1]," has an area of ",country_data[i,2]," sq kms.")
+    i <- i+1
+}
+
+# BREAK Control Statement
+for (i in c(1:10)) {
+    if (i==3) break
+    print(i)
+}
+
+# NEXT Control Statement
+for (i in c(1:10)) {
+    if (i %in% vector1) next
+    print(i)
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 #Understanding apply function
@@ -162,6 +272,8 @@ print(df_hwg$gender)
 generate_factor_col <- gl(4, 2, labels = c("Alpha", "Beta","Charlie","Delta"))    
 View(generate_factor_col)
 
+
+#---------------------------------------------------------------------------------------------------------------------------------------
 
 #Playing with strings
 a9 <- "This is a sample string"
