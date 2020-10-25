@@ -1,10 +1,12 @@
+#Current line : 247
+
 #Loading required packages
 used_libraries <- c("dplyr","lubridate")
 lapply(used_libraries, require, character.only = TRUE)
 
 getwd()
 
-# Creating a Vector
+# Creating a Vector : elemenrs are of same data type
 v1 <- c(1:12)
 
 # Creating a matrix
@@ -19,7 +21,7 @@ df1 <- data.frame(
     stringsAsFactors = FALSE
 )
 
-# Creating a list
+# Creating a list : elements can be of different data types
 a1 <- "John"    #Character
 a2 <- 3.14      #Numeric
 a3 <- FALSE     #Logical
@@ -73,6 +75,11 @@ inflation_data_col <- names(inflation_data)
 inflation_data_col[3:ncol(inflation_data)] <- gsub(pattern="[^0-9]",replacement="",ignore.case=TRUE, x=inflation_data_col[3:ncol(inflation_data)])
 #Replacing column names with modified names
 names(inflation_data)<- inflation_data_col
+
+#Reading R&D data
+rnd_data <-  read.csv("rnd.csv", header = TRUE)
+rnd_data$Value <- as.numeric(as.character(rnd_data$Value))
+rnd_data[is.na(rnd_data)] <- 0
 
 #METADATA
 #Get the structure, summary, field names, column names, row names of the data
@@ -129,7 +136,7 @@ View(na.omit(country_data))
 View(na.omit(country_data[,c(1,2,3,4,5)]))
 
 
-#FLOW CONTROL STATEMENTS IN R ============================================================
+#FLOW CONTROL STATEMENTS IN R =====================================================================
 # IF Statement
 value_to_be_matched <- "Delhi" #Change the content of the string to see different results
 if(!is.na(match(value_to_be_matched,country_data[,1]))){
@@ -174,8 +181,8 @@ for(i in vector2){
     print(paste0("Iteration ",match(i,vector2)," : ",i))
 }
 #Iteration is done on a list
-list2 <- c("1","One","2","Two","3","Three",vector1,vector2,subset4)
 subset4 <- country_data[1]
+list2 <- c("1","One","2","Two","3","Three",vector1,vector2,subset4)
 for(i in list1){
     print(paste0("Iteration ",match(i,list1)," : ",i))
 }
@@ -201,15 +208,43 @@ for (i in c(1:10)) {
 }
 
 
+# APPLY FAMILY OF FUNCTIONS========================================================================
+#apply : Is performed on an array or a matrix
+temp4 <- matrix(c(1:10, 11:20, 21:30), nrow = 10, ncol = 3)
+#For row operation : Margin = 1
+apply(temp4, 1, sum)
+#For column operation : Margin = 2
+apply(temp4, 2, sum)
+#Giving the whole user defined function in the argument itself
+apply(temp4, 1, function(x) x*2)
+apply(temp4, 2, function(x) x*2)
+#For each cell operation : Margin = 1:2
+apply(temp4,1:2, function(x) x+5)
+#Specifying the function separately and just passing the name of it
+custom_function <- function(x){
+    sd(x)/sqrt(length(x))
+}
+apply(temp4, 2, custom_function)
+apply(temp4, 1, custom_function)
 
 
+#lapply, sapply, vapply : Is performed on a vactor or a list
+#lapply returns a list as output but sapply give a more simplified output i.e. returns a vector wherever possible
+#vapply requires you to specify the output data type (FUN.VALUE = data_type)
+View(l1)
+View(list1)
+View(list2)
+View(lapply(l1, length))
+View(sapply(l1, length))
+View(vapply(l1, length, numeric(1))) #Need to work on more examples of vapply
 
-
-
-
-
-
-
+#tapply
+#second arguement is the column on which indexing needs to be done
+#first argument is the column on which the function is applied
+View(rnd_data)
+# tapply(rnd_data$Value, rnd_data$Year, sum)
+# temp5 <- as.matrix(unlist(tapply(rnd_data$Value, rnd_data$Year, function(x) c(sum(x),mean(x)))),nrow=5,col=2)
+temp5 <- matrix(unlist(tapply(rnd_data$Value, rnd_data$Year, function(x) c(sum(x),mean(x))),use.names = FALSE),nrow=length(unique(rnd_data$Year)),byrow = TRUE)
 
 
 #Understanding apply function
