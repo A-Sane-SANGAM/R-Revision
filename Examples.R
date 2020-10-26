@@ -246,38 +246,20 @@ View(rnd_data)
 # temp5 <- as.matrix(unlist(tapply(rnd_data$Value, rnd_data$Year, function(x) c(sum(x),mean(x)))),nrow=5,col=2)
 temp5 <- matrix(unlist(tapply(rnd_data$Value, rnd_data$Year, function(x) c(sum(x),mean(x))),use.names = FALSE),nrow=length(unique(rnd_data$Year)),byrow = TRUE)
 
+#mapply : It applies the specified functions to the arguments one by one
+v2 <- vector(mode = "numeric", length = 900)
+v2 <- mapply(function(x,y){paste0(x," ",y)}, rnd_data$Value, rnd_data$Unit)
+mapply(function(x,y){x^y},c(2,3),c(3,4))
+mapply(function(x,y,z,k){(x+k)^(y+z)},c(a=2,b=3),c(A=3,B=4),MoreArgs=list(1,2))
+mapply(function(x,y,z,k){(x+k)^(y+z)},c(a=2,b=3),c(A=3,B=4),MoreArgs=list(1,2), USE.NAMES = FALSE)
 
-#Understanding apply function
-temp1 <- data_set
-temp1$Merch_Level <- as.character(0)
-temp1 <- unique(temp1[,c(1,9,13,14,16)])
-temp1[is.na(temp1)] <- 0
-temp1 <- temp1[which(temp1$SGM_Category_Group != 0),]
+#by : is similar to tapply function but is used over data frame or matrix
+View(iris)
+by(iris$Sepal.Length,list(iris$Species),mean)
+View(mtcars)
+by(mtcars$hp,list(mtcars$gear,mtcars$cyl),mean)
 
 
-#Apply functions
-m2 <- matrix(1:100, ncol = 5)
-View(m2)
-class(m2)
-res2 <- apply(m2, 2,sum)
-class(res2)
-res3 <- matrix(apply(m2, 2,sum),nrow = 3, byrow = T)
-class(res3)
-#Using user defined function
-check<-function(x){
-    return(x[x>5])
-}
-res4 <- apply(m2,2,check)
-class(res4)
-
-#Checking UDF with dataframes
-View(temp1)
-class(temp1)
-res5 <- apply(temp1[1], 2, normalise_SKU)
-
-normalise_SKU <- function(x){
-    ifelse(nchar(x)>6,substr(x,2,7),x)
-}
 
 
 install.packages("Hmisc")
